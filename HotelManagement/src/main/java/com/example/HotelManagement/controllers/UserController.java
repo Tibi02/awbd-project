@@ -4,6 +4,7 @@ import com.example.HotelManagement.models.User;
 import com.example.HotelManagement.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
@@ -14,10 +15,14 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public String registerUser(@ModelAttribute @Valid User user) {
-        userService.saveUser(user); // Save user if validation passes
+    public String register(@ModelAttribute @Valid User user, BindingResult result) {
+        if (result.hasErrors()) {
+            return "register"; // sau trimiți mesaj JSON de eroare
+        }
+        userService.saveUser(user);
         return "redirect:/login";
     }
+
 
     @PostMapping("/login")
     public String loginUser(@RequestParam String email, @RequestParam String password) {
