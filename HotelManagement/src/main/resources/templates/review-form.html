@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Review Form</title>
+</head>
+<body>
+<h1>Rate Your Booking</h1>
+
+<!-- We bind the form to "review", as provided by the controller -->
+<form th:action="@{/submit-review}" method="post" th:object="${review}">
+
+    <label for="rating">Rating (1-5):</label>
+    <input type="number" id="rating" th:field="*{rating}" min="1" max="5" required /><br/><br/>
+
+    <label for="comment">Comment:</label><br/>
+    <textarea id="comment" th:field="*{comment}" rows="5" cols="40"></textarea><br/><br/>
+
+    <!-- Hidden fields for userId, hotelId to keep them in the form (if needed) -->
+    <input type="hidden" th:field="*{userId}" />
+    <input type="hidden" th:field="*{hotelId}" />
+
+    <button type="submit">Submit Review</button>
+</form>
+</body>
+</html>

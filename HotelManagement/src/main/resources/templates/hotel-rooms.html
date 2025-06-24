@@ -1,0 +1,19 @@
+<!-- hotel-rooms.html -->
+<h2>Available Rooms</h2>
+<ul>
+    <h2>Available Rooms</h2>
+    <ul>
+        <li th:each="room : ${rooms}">
+            <p>Room Number: <span th:text="${room.roomNumber}">Room Number</span></p>
+            <p>Room Type: <span th:text="${room.type}">Room Type</span></p>
+            <p>Price: <span th:text="${room.pricePerNight}">Price</span></p>
+
+            <form action="/book-room" method="get">
+                <input type="hidden" name="roomId" th:value="${room.id}" />
+                <input type="hidden" name="checkInDate" th:value="${checkInDate}" />
+                <input type="hidden" name="checkOutDate" th:value="${checkOutDate}" />
+                <button type="submit">Book Room</button>
+            </form>
+        </li>
+    </ul>
+</ul>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Rooms</title>
+</head>
+<body>
+<h1>Available Rooms</h1>
+<ul>
+    <!-- Loop through rooms dynamically -->
+    <li th:each="room : ${rooms}">
+        <h2 th:text="'Room Number: ' + ${room.roomNumber}">Room Number</h2>
+        <p th:text="'Type: ' + ${room.type}">Room Type</p>
+        <p th:text="'Price per Night: $' + ${room.pricePerNight}">Price per Night</p>
+        <!-- Book Room Button -->
+        <a th:href="'/book-room?roomId=' + ${room.id}">
+            <button>Book Room</button>
+        </a>
+    </li>
+</ul>
+</body>
+</html>

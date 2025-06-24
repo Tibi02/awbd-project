@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Hotels</title>
+</head>
+<body>
+<h1>Available Hotels</h1>
+<ul>
+    <!-- Loop through hotels dynamically -->
+    <li>
+        <h2>${hotel.name}</h2>
+        <p>Location: ${hotel.location}</p>
+        <p>Rating: ${hotel.rating}/5</p>
+        <a href="/show-rooms?hotelId=${hotel.id}&checkInDate=${checkInDate}&checkOutDate=${checkOutDate}">
+            <button>Show Rooms</button>
+        </a>
+    </li>
+</ul>
+</body>
+</html>

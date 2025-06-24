@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"> <!-- Ensure Thymeleaf namespace is included -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete a Hotel</title>
+</head>
+<body>
+
+<h1>Delete a Hotel</h1>
+
+<!-- Delete Hotel Form -->
+<form action="/delete-hotel" method="post">
+    <label for="hotelId">Select Hotel to Delete:</label>
+    <select id="hotelId" name="hotelId" required>
+        <option value="">--Choose Hotel--</option>
+        <!-- Dynamically load hotels -->
+        <option th:each="hotel : ${hotels}" th:value="${hotel.id}" th:text="${hotel.name}">Hotel Name</option>
+    </select>
+    <br><br>
+    <button type="submit">Delete Hotel</button>
+</form>
+
+<!-- Optional: Display Confirmation or Error Messages -->
+<div th:if="${successMessage}">
+    <p th:text="${successMessage}"></p>
+</div>
+<div th:if="${errorMessage}">
+    <p th:text="${errorMessage}"></p>
+</div>
+
+<!-- Back to Dashboard Link -->
+<br>
+<a href="/checkin-checkout">Back to Dashboard</a>
+
+</body>
+</html>

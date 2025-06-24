@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Hotels</title>
+</head>
+<body>
+<h1>Available Hotels</h1>
+<ul>
+    <!-- Loop through hotels dynamically -->
+    <li th:each="hotel : ${hotels}">
+        <h2 th:text="${hotel.name}">Hotel Name</h2>
+        <p th:text="'Location: ' + ${hotel.location}">Location</p>
+        <p>Stars: <span th:text="${hotel.rating}"></span></p>
+        <a th:href="'/show-rooms?hotelId=' + ${hotel.id} + '&checkInDate=' + ${checkInDate} + '&checkOutDate=' + ${checkOutDate}">
+            <button>Show Rooms</button>
+        </a>
+        <!-- "Details" button points to a new endpoint we'll create -->
+        <a th:href="@{/hotel-details(hotelId=${hotel.id})}">
+            <button>Details</button>
+        </a>
+    </li>
+</ul>
+</body>
+</html>

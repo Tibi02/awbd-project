@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Hotel Details</title>
+</head>
+<body>
+    <h1 th:text="${hotel.name}">Hotel Name</h1>
+    <p>
+        Location: <span th:text="${hotel.location}">Location</span><br>
+        Stars: <span th:text="${hotel.rating}">Stars</span>/5
+    </p>
+
+    <h2>Services</h2>
+    <ul>
+        <li th:each="service : ${services}">
+            <strong th:text="${service.name}">Service Name</strong>:
+            <span th:text="${service.description}">Description</span>
+            <em>(Price: $<span th:text="${service.price}"></span>)</em>
+        </li>
+    </ul>
+
+</body>
+</html>

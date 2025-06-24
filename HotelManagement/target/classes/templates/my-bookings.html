@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Bookings</title>
+</head>
+<body>
+<h1>My Bookings</h1>
+
+<table border="1">
+    <tr>
+        <th>Hotel Name</th>
+        <th>Room Number</th>
+        <th>Check-In Date</th>
+        <th>Check-Out Date</th>
+        <th>Actions</th>
+    </tr>
+    <tr th:each="booking : ${bookings}">
+        <td th:text="${booking.hotel.name}">Hotel Name</td>
+        <td th:text="${booking.room.roomNumber}">Room Number</td>
+        <td th:text="${booking.checkInDate}">Check-In</td>
+        <td th:text="${booking.checkOutDate}">Check-Out</td>
+        <td>
+            <!-- RATE button if we’re past the check-out date -->
+            <th:block th:if="${booking.checkOutDate != null
+                              and booking.checkOutDate.isBefore(T(java.time.LocalDate).now())}">
+                <form th:action="@{/rate-booking}" method="get" style="display:inline;">
+                    <input type="hidden" name="bookingId" th:value="${booking.id}" />
+                    <button type="submit">Rate</button>
+                </form>
+            </th:block>
+
+            <!-- DELETE button if we’re still before check-in date -->
+            <th:block th:if="${booking.checkInDate != null
+                              and booking.checkInDate.isAfter(T(java.time.LocalDate).now())}">
+                <form th:action="@{/delete-booking}" method="post" style="display:inline;">
+                    <input type="hidden" name="bookingId" th:value="${booking.id}" />
+                    <button type="submit">Delete Booking</button>
+                </form>
+            </th:block>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
