@@ -2,25 +2,40 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Available Hotels</title>
+    <title>Available Hotels (Paginated)</title>
 </head>
 <body>
 <h1>Available Hotels</h1>
+<form method="get" th:action="@{/hotel-search-available-hotels}">
+    <input type="hidden" name="checkInDate" th:value="${checkInDate}"/>
+    <input type="hidden" name="checkOutDate" th:value="${checkOutDate}"/>
+    <label>Sort by:
+        <select name="sortBy">
+            <option value="name" th:selected="${sortBy == 'name'}">Name</option>
+            <option value="rating" th:selected="${sortBy == 'rating'}">Rating</option>
+        </select>
+    </label>
+    <button type="submit">Sort</button>
+</form>
 <ul>
-    <!-- Loop through hotels dynamically -->
-    <li th:each="hotel : ${hotels}">
-        <h2 th:text="${hotel.name}">Hotel Name</h2>
-        <p th:text="'Location: ' + ${hotel.location}">Location</p>
+    <li th:each="hotel : ${hotelsPage.content}">
+        <h2 th:text="${hotel.name}"></h2>
+        <p th:text="'Location: ' + ${hotel.location}"></p>
         <p>Stars: <span th:text="${hotel.rating}"></span></p>
-        <a th:href="'/show-rooms?hotelId=' + ${hotel.id} + '&checkInDate=' + ${checkInDate} + '&checkOutDate=' + ${checkOutDate}">
-            <button>Show Rooms</button>
+        <a th:href="@{/show-rooms(hotelId=${hotel.id}, checkInDate=${checkInDate}, checkOutDate=${checkOutDate})}">
+            See rooms
         </a>
-        <!-- "Details" button points to a new endpoint we'll create -->
-        <a th:href="@{/hotel-details(hotelId=${hotel.id})}">
-            <button>Details</button>
-        </a>
+        <a th:href="@{/hotel-details(hotelId=${hotel.id})}"><button>Details</button></a>
     </li>
 </ul>
+<div>
+    <span th:text="'Page ' + ${hotelsPage.number + 1} + ' of ' + ${hotelsPage.totalPages}"></span>
+    <div>
+        <a th:if="${hotelsPage.hasPrevious()}"
+           th:href="@{/hotel-search-available-hotels(checkInDate=${checkInDate}, checkOutDate=${checkOutDate}, page=${hotelsPage.number - 1}, sortBy=${sortBy})}">Previous</a>
+        <a th:if="${hotelsPage.hasNext()}"
+           th:href="@{/hotel-search-available-hotels(checkInDate=${checkInDate}, checkOutDate=${checkOutDate}, page=${hotelsPage.number + 1}, sortBy=${sortBy})}">Next</a>
+    </div>
+</div>
 </body>
 </html>

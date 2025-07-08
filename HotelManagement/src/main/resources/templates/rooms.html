@@ -14,9 +14,9 @@
         <p th:text="'Type: ' + ${room.type}">Room Type</p>
         <p th:text="'Price per Night: $' + ${room.pricePerNight}">Price per Night</p>
         <!-- Book Room Button -->
-        <a th:href="'/book-room?roomId=' + ${room.id}">
-            <button>Book Room</button>
-        </a>
+        <a th:href="@{/payment(roomId=${room.id})}">Book now</a>
+
+
     </li>
 </ul>
 </body>

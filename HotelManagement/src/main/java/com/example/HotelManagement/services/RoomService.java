@@ -23,9 +23,11 @@ public class RoomService {
                 .orElseThrow(() -> new RuntimeException("Room not found"));
     }
 
-    // Save a new room (used for adding rooms)
     public Room saveRoom(Room room) {
-        return roomRepository.save(room); // Save the room to the database
+        return roomRepository.save(room);
     }
 
+    public List<Room> getRoomsByHotelId(Long hotelId) {
+        return roomRepository.findByHotelId(hotelId);
+    }
 }

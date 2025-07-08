@@ -1,6 +1,8 @@
 package com.example.HotelManagement.repositories;
 
 import com.example.HotelManagement.models.Hotel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,6 +19,13 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
     List<Hotel> findAvailableHotels(
             @Param("checkInDate") LocalDate checkInDate,
             @Param("checkOutDate") LocalDate checkOutDate);
+
+    @Query("SELECT h FROM Hotel h WHERE h.id NOT IN (" +
+            "SELECT b.room.hotel.id FROM Booking b WHERE " +
+            "b.checkInDate <= :checkOutDate AND b.checkOutDate >= :checkInDate)")
+    Page<Hotel> findAvailableHotelsPaginated(@Param("checkInDate") LocalDate checkInDate,
+                                             @Param("checkOutDate") LocalDate checkOutDate,
+                                             Pageable pageable);
 }
 
 

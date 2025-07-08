@@ -1,5 +1,6 @@
 package com.example.HotelManagement.controllers;
 
+import org.springframework.ui.Model;
 import com.example.HotelManagement.models.Booking;
 import com.example.HotelManagement.models.Room;
 import com.example.HotelManagement.models.Hotel;
@@ -7,13 +8,13 @@ import com.example.HotelManagement.models.User;
 import com.example.HotelManagement.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
-@RestController
-@RequestMapping("/api/bookings")
+@Controller
 public class BookingController {
 
     @Autowired
@@ -64,7 +65,43 @@ public class BookingController {
         return bookingService.saveBooking(booking);
     }
 
-    @PostMapping("/process-payment")
+    @GetMapping("/available-rooms")
+    public String showAvailableRooms(@RequestParam Long hotelId,
+                                     @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInDate,
+                                     @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOutDate,
+                                     Model model) {
+        List<Room> rooms = roomService.getRoomsByHotelId(hotelId);
+        model.addAttribute("rooms", rooms);
+        model.addAttribute("checkInDate", checkInDate);
+        model.addAttribute("checkOutDate", checkOutDate);
+        return "rooms"; // rooms.html
+    }
+
+
+    @GetMapping("/book-room")
+    public String showBookingPage(@RequestParam Long roomId,
+                                  @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInDate,
+                                  @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOutDate,
+                                  Model model) {
+        Room room = roomService.getRoomById(roomId);
+        if (room == null) {
+            throw new RuntimeException("Room not found.");
+        }
+
+        Booking booking = new Booking();
+        booking.setRoom(room);
+        booking.setHotel(room.getHotel());
+        booking.setCheckInDate(checkInDate);
+        booking.setCheckOutDate(checkOutDate);
+
+        model.addAttribute("booking", booking);
+        model.addAttribute("currentUser", userService.getCurrentUser());
+
+        return "payment"; // This must match payment.html from templates
+    }
+
+
+    @PostMapping("/booking-payment")
     public String processBookingPayment(
             @RequestParam Long bookingId,
             @RequestParam String paymentMethod) {
@@ -78,13 +115,17 @@ public class BookingController {
     }
 
     @GetMapping("/my-bookings")
-    public List<Booking> showMyBookings() {
+    public String showMyBookings(Model model) {
         User currentUser = userService.getCurrentUser();
         if (currentUser == null) {
             throw new RuntimeException("No current user found.");
         }
-        return bookingService.getBookingsByUserId(currentUser.getId());
+
+        List<Booking> bookings = bookingService.getBookingsByUserId(currentUser.getId());
+        model.addAttribute("bookings", bookings);
+        return "my-bookings";
     }
+
 
     @DeleteMapping("/delete/{bookingId}")
     public String deleteBooking(@PathVariable Long bookingId) {

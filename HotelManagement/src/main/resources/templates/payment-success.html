@@ -4,12 +4,7 @@
     <title>Payment Success</title>
 </head>
 <body>
-    <p>Thank you for booking Room Number:
-        <span th:text="${room.roomNumber}"></span>
-    </p>
-    <p>Payment Method:
-        <span th:text="${paymentMethod}"></span>
-    </p>
-
+    <h2 th:text="${message}">Thank you! Your payment was successful.</h2>
+    <a th:href="@{checkin-checkout}">Return to Home</a>
 </body>
 </html>

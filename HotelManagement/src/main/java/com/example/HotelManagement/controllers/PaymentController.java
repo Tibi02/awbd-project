@@ -2,18 +2,19 @@ package com.example.HotelManagement.controllers;
 
 import com.example.HotelManagement.exceptions.PaymentProcessingException;
 import com.example.HotelManagement.exceptions.RoomNotFoundException;
-import org.springframework.ui.Model;
 import com.example.HotelManagement.models.Booking;
-import com.example.HotelManagement.models.Payment;
 import com.example.HotelManagement.models.Room;
+import com.example.HotelManagement.models.User;
 import com.example.HotelManagement.services.BookingService;
 import com.example.HotelManagement.services.PaymentService;
 import com.example.HotelManagement.services.RoomService;
+import com.example.HotelManagement.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 
@@ -29,37 +30,59 @@ public class PaymentController {
     @Autowired
     private RoomService roomService;
 
-    @PostMapping("/process-payment")
-    public String processPayment(@RequestParam Long roomId,
-                                 @RequestParam String checkInDate,
-                                 @RequestParam String checkOutDate,
-                                 @RequestParam String paymentMethod) {
+    @Autowired
+    private UserService userService;
+
+    @PostMapping("/handle-payment")
+    public String processPayment(
+            @RequestParam Long roomId,
+            @RequestParam String checkInDate,
+            @RequestParam String checkOutDate,
+            @RequestParam String paymentMethod) {
+
         try {
-            // Fetch room details
             Room room = roomService.getRoomById(roomId);
             if (room == null) {
                 throw new RoomNotFoundException("Room with ID " + roomId + " not found.");
             }
 
-            // Create and save booking
+            if (room.getHotel() == null) {
+                throw new RuntimeException("Room does not have a hotel assigned!");
+            }
+
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String email = authentication.getName();
+
+            User user = userService.findByEmail(email);
+            if (user == null) {
+                throw new RuntimeException("No authenticated user.");
+            }
+
             Booking booking = new Booking();
             booking.setRoom(room);
             booking.setHotel(room.getHotel());
+            booking.setUser(user);
             booking.setCheckInDate(LocalDate.parse(checkInDate));
             booking.setCheckOutDate(LocalDate.parse(checkOutDate));
-            bookingService.saveBooking(booking);
 
-            // Process payment
-            paymentService.processPayment(roomId, paymentMethod);
+            Booking savedBooking = bookingService.saveBooking(booking);
 
-            // Redirect to success page
+            paymentService.processPayment(savedBooking.getId(), paymentMethod);
+
             return "redirect:/payment-success";
+
         } catch (RoomNotFoundException | PaymentProcessingException ex) {
-            // Re-throw exceptions to be handled by GlobalExceptionHandler
             throw ex;
         } catch (Exception ex) {
-            // Handle other unexpected exceptions
-            throw new PaymentProcessingException("An unexpected error occurred.");
+            ex.printStackTrace();
+            throw new PaymentProcessingException("An unexpected error occurred during payment.");
         }
+    }
+
+
+    @GetMapping("/payment-success")
+    public String showPaymentSuccessPage(Model model) {
+        model.addAttribute("message", "Thank you! Your payment was successful.");
+        return "payment-success";
     }
 }

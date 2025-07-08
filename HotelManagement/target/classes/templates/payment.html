@@ -1,32 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment</title>
 </head>
 <body>
     <h1>Payment for Room</h1>
+
     <p>Room Number: <span th:text="${booking.room.roomNumber}"></span></p>
-    <p>Price: $<span th:text="${booking.room.pricePerNight}"></span></p>
+    <p>Price per Night: $<span th:text="${booking.room.pricePerNight}"></span></p>
 
-    <form action="/process-booking-payment" method="post">
-        <input type="hidden" name="roomId" th:value="${booking.room.id}">
-        <input type="hidden" name="userId" th:value="${currentUser.id}">
-
-        <!-- Use booking.checkInDate/.checkOutDate instead of checkInDate / checkOutDate -->
+    <form th:action="@{/handle-payment}" method="post">
+        <input type="hidden" name="roomId" th:value="${booking.room.id}" />
         <input type="hidden" name="checkInDate" th:value="${booking.checkInDate}" />
         <input type="hidden" name="checkOutDate" th:value="${booking.checkOutDate}" />
 
         <label for="paymentMethod">Payment Method:</label>
         <select name="paymentMethod" id="paymentMethod" required>
-            <option value="credit_card">Credit Card</option>
-            <option value="paypal">PayPal</option>
+            <option value="CREDIT_CARD">Credit Card</option>
+            <option value="PAYPAL">PayPal</option>
         </select>
+        <br /><br />
         <button type="submit">Pay</button>
     </form>
-
-
-
 </body>
 </html>

@@ -2,7 +2,11 @@ package com.example.HotelManagement.services;
 
 import com.example.HotelManagement.models.Hotel;
 import com.example.HotelManagement.repositories.HotelRepository;
+import org.springframework.data.domain.Page;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -10,36 +14,47 @@ import java.util.List;
 
 @Service
 public class HotelService {
+
+    private static final Logger logger = LoggerFactory.getLogger(HotelService.class);
+
     @Autowired
     private HotelRepository hotelRepository;
 
     public List<Hotel> findAvailableHotels(LocalDate checkInDate, LocalDate checkOutDate) {
+        logger.info("Finding available hotels between {} and {}", checkInDate, checkOutDate);
         return hotelRepository.findAvailableHotels(checkInDate, checkOutDate);
     }
 
     public List<Hotel> getAvailableHotels(String checkInDateStr, String checkOutDateStr) {
+        logger.info("Parsing check-in and check-out dates from strings: {}, {}", checkInDateStr, checkOutDateStr);
         LocalDate checkInDate = LocalDate.parse(checkInDateStr);
         LocalDate checkOutDate = LocalDate.parse(checkOutDateStr);
 
-        // Now call the real method
-        return hotelRepository.findAvailableHotels(checkInDate, checkOutDate);
+        return findAvailableHotels(checkInDate, checkOutDate);
     }
 
     public Hotel getHotelById(Long hotelId) {
+        logger.info("Fetching hotel with ID: {}", hotelId);
         return hotelRepository.findById(hotelId).orElse(null);
     }
 
-    // Save a new hotel (used for adding hotels)
     public Hotel saveHotel(Hotel hotel) {
-        return hotelRepository.save(hotel); // Save the hotel to the database
+        logger.info("Saving hotel: {}", hotel.getName());
+        return hotelRepository.save(hotel);
     }
 
-    // Delete a hotel (used for deleting hotels)
     public void deleteHotel(Long hotelId) {
-        hotelRepository.deleteById(hotelId); // Delete the hotel from the database
+        logger.warn("Deleting hotel with ID: {}", hotelId);
+        hotelRepository.deleteById(hotelId);
     }
 
     public List<Hotel> getAllHotels() {
-        return hotelRepository.findAll(); // This assumes you have a method to fetch all hotels
+        logger.info("Fetching all hotels");
+        return hotelRepository.findAll();
+    }
+
+    public Page<Hotel> findAvailableHotelsPaginated(LocalDate checkInDate, LocalDate checkOutDate, Pageable pageable) {
+        logger.info("Paginated query for hotels between {} and {}", checkInDate, checkOutDate);
+        return hotelRepository.findAvailableHotelsPaginated(checkInDate, checkOutDate, pageable);
     }
 }
